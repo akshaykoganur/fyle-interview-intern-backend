@@ -80,8 +80,14 @@ class Assignment(db.Model):
         assignment = Assignment.get_by_id(_id)
         assertions.assert_found(assignment, 'No assignment with this id was found')
         assertions.assert_valid(grade is not None, 'assignment with empty grade cannot be graded')
-        assertions.assert_valid(assignment.teacher_id == auth_principal.teacher_id, 'This assignment was submitted to another teacher')
-        assertions.assert_valid(assignment.status == AssignmentStateEnum.SUBMITTED, 'Only a submitted assignment can be graded')
+
+        if auth_principal.teacher_id is not None:
+            #If user is teacher
+            assertions.assert_valid(assignment.teacher_id == auth_principal.teacher_id, 'This assignment was submitted to another teacher')
+            assertions.assert_valid(assignment.state == AssignmentStateEnum.SUBMITTED, 'Only a submitted assignment can be graded')
+        elif auth_principal.principal_id is not None:
+            #If user is principal
+            assertions.assert_valid(assignment.state != AssignmentStateEnum.DRAFT, 'Draft assignment cannot be graded')
 
         assignment.grade = grade
         assignment.state = AssignmentStateEnum.GRADED
@@ -99,4 +105,4 @@ class Assignment(db.Model):
     
     @classmethod
     def get_assignments_by_principal(cls):
-        return cls.query.all()
+        return cls.filter(cls.state == AssignmentStateEnum.SUBMITTED or cls.state == AssignmentStateEnum.GRADED).all()

@@ -56,3 +56,32 @@ pytest -vvv -s tests/
 # pytest --cov
 # open htmlcov/index.html
 ```
+
+## Dockerized application setup
+
+1. Install docker
+2. Fork this github repository to your github account
+3. Clone the forked repository on your local machine
+
+### Commands to run dockerized application
+
+```
+docker-compose build
+docker-compose up
+```
+
+### Commands to run tests
+
+```
+#get container name
+docker ps
+
+#enter your container name in bracket
+docker exec -it <container-name> sh
+
+# Run tests
+pytest -vvv -s tests/
+
+# For test coverage report
+pytest --cov
+```
